@@ -1,7 +1,15 @@
+# Environment secrets
 .env
 .env.*
 !.env.example
+db.env
+**/db.env
+Backend/.env
+Backend/.env.*
+!Backend/.env.example
+
+# Local dependencies and database backups
+node_modules/
 **/node_modules/
 *.dump
-*.backup
-*.sql.gz
+*.sql

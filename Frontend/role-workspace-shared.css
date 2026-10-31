@@ -1,0 +1,17 @@
+
+/* Consistent sidebar and account header across Admin, Doctor and Student */
+:root{--it-sidebar-width:250px}
+.sidebar{width:var(--it-sidebar-width)!important;min-width:var(--it-sidebar-width)!important;padding:18px 14px!important;background:#0d1830!important}
+.main-content{margin-left:var(--it-sidebar-width)!important;width:calc(100% - var(--it-sidebar-width))!important;min-width:0}
+.sidebar .workspace-box{min-height:68px;padding:10px!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:12px!important;background:rgba(255,255,255,.055)!important}
+.sidebar .workspace-badge{width:42px!important;height:42px!important;min-width:42px!important;overflow:hidden;border-radius:10px!important;background:#fff!important}
+.sidebar .workspace-badge img{width:100%;height:100%;object-fit:contain}
+.sidebar .workspace-box [data-organization-name],.sidebar .workspace-box .fw-semibold{white-space:normal;overflow-wrap:anywhere;line-height:1.3}
+.sidebar .nav-link{min-height:42px;padding:11px 13px!important;border-radius:10px!important}
+.it-account-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-left:auto;white-space:nowrap}
+.it-account-name{font-size:12px;font-weight:650;color:#526078;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.it-account-avatar{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#e8efff;color:#2457d6;font-size:11px;font-weight:800}
+.it-account-logout{border:1px solid #d7deea;background:#fff;color:#526078;border-radius:9px;padding:6px 10px;font-size:12px}
+.it-account-logout:hover{background:#f3f6fb}
+@media(max-width:850px){.sidebar{width:100%!important;min-width:0!important;position:relative!important}.main-content{margin-left:0!important;width:100%!important}.it-account-name{max-width:110px}}
+@media(max-width:520px){.it-account-name{display:none}.it-account-actions{gap:6px}}

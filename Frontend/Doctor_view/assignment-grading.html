@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script src="../api-config.js"></script>
+
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iTask — Grade submissions</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../role-workspace-shared.css">
+</head>
+<body>
+<div class="main-content" style="margin-left:0;max-width:1400px;margin:0 auto;padding:32px">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div><a href="instructor-assignments.html" class="text-decoration-none">← Back to assignments</a><h2 class="fw-bold mt-2">Submission grading</h2><p class="text-muted">Review real student submissions and save grades from 0 to 100.</p></div>
+    <button id="refresh" class="btn btn-outline-primary">Refresh submissions</button>
+  </div>
+  <div id="status" class="alert alert-secondary">Loading submissions…</div>
+  <div class="card border-0 shadow-sm rounded-4"><div class="table-responsive">
+    <table class="table align-middle mb-0"><thead><tr><th>Student</th><th>Assignment / course</th><th>Submitted file</th><th>Submitted at</th><th style="min-width:260px">Grade & feedback</th></tr></thead><tbody id="rows"><tr><td colspan="5">Loading…</td></tr></tbody></table>
+  </div></div>
+</div>
+<script>
+(() => {
+ const API="", token=localStorage.getItem("itaskToken");
+ const status=document.getElementById("status"), rows=document.getElementById("rows");
+ const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ async function api(path, options={}) {
+   const response=await fetch(API+path,{...options,headers:{"Authorization":`Bearer ${token}`,"Content-Type":"application/json"}});
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok) throw new Error(data.message||`Request failed (${response.status})`);
+   return data;
+ }
+ async function load(){
+   if(!token){status.className="alert alert-warning";status.textContent="Please log in as a doctor.";rows.innerHTML="";return;}
+   try {
+    const data=await api("/api/doctor/submissions");
+    status.className="alert alert-success";
+    status.textContent=`Loaded ${data.submissions.length} submission(s).`;
+    rows.innerHTML=data.submissions.length?data.submissions.map(s=>`<tr>
+      <td><strong>${safe(s.student_name)}</strong><div class="small text-muted">${safe(s.student_email)}</div></td>
+      <td><strong>${safe(s.assignment_title)}</strong><div class="small text-muted">${safe(s.course_name)}</div></td>
+      <td><a href="${safe(s.file_url)}" target="_blank" rel="noopener noreferrer">Open submission</a></td>
+      <td>${safe(new Date(s.submitted_at).toLocaleString())}</td>
+      <td><form class="grade-form" data-id="${safe(s.submission_id)}"><div class="input-group input-group-sm mb-2"><input class="form-control" type="number" min="0" max="100" step="0.25" required placeholder="0–100" value="${s.grade===null?"":safe(s.grade)}"><span class="input-group-text">/100</span></div><textarea class="form-control form-control-sm mb-2" rows="2" placeholder="Feedback (optional)">${safe(s.feedback||"")}</textarea><button class="btn btn-primary btn-sm" type="submit">Save grade</button></form></td>
+    </tr>`).join(""):'<tr><td colspan="5" class="text-muted p-4">No submissions yet. Students’ submissions will appear here.</td></tr>';
+   } catch(e){status.className="alert alert-danger";status.textContent=e.message;}
+ }
+ rows.addEventListener("submit",async event=>{
+  const form=event.target.closest(".grade-form"); if(!form)return; event.preventDefault();
+  const button=form.querySelector("button"); button.disabled=true;
+  try {
+   await api(`/api/doctor/submissions/${encodeURIComponent(form.dataset.id)}/grade`,{method:"PATCH",body:JSON.stringify({grade:form.querySelector('input[type="number"]').value,feedback:form.querySelector("textarea").value})});
+   status.className="alert alert-success";status.textContent="Grade saved successfully.";await load();
+  }catch(e){status.className="alert alert-danger";status.textContent=e.message;button.disabled=false;}
+ });
+ document.getElementById("refresh").addEventListener("click",load);load();
+})();
+</script>
+    <script src="../organization-branding.js"></script>
+<script src="../role-workspace-shared.js"></script>
+</body></html>

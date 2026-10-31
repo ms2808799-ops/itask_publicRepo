@@ -1,0 +1,241 @@
+<head>
+    <script src="../api-config.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../role-workspace-shared.css">
+</head>
+<body style="background-color: #f8fafc;">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <nav class="navbar navbar-expand-lg bg-white border-bottom px-4 py-3 sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="student-view.html">
+                <img src="images/itask logo.webp" alt="Logo" class="logo-img" style="width: 32px; height: 32px; object-fit: contain;">
+                <span class="fs-5 fw-bold text-dark">iTask</span>
+            </a>
+
+            <div class="collapse navbar-collapse justify-content-center">
+                <ul class="navbar-nav gap-4">
+                   <li class="nav-item">
+    <a class="nav-link text-muted" href="student-view.html">My learning</a>
+</li>
+                  <li class="nav-item">
+    <a class="nav-link text-muted" href="academic-hub.html">Academic hub</a>
+</li>
+                </ul>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-1 text-muted small fw-semibold cursor-pointer">
+                    <i class="fa-solid fa-globe"></i> EN
+                </div>
+                <i class="fa-regular fa-circle-question fs-5 text-muted cursor-pointer"></i>
+                <div id="studentAvatar" class="avatar-circle rounded-circle text-white d-flex align-items-center justify-content-center fw-bold bg-secondary" style="width: 32px; height: 32px; font-size: 11px;">ST</div>
+                <button type="button" id="studentSignOut" class="btn btn-sm btn-outline-secondary">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4 px-4" style="max-width: 1400px;">
+        
+        <div class="card border-0 rounded-4 text-white p-4 mb-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #0b1329 0%, #1e3a8a 100%);">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    
+                    <h2 class="fw-bold mb-2" id="studentWelcomeHeading">Welcome back!</h2>
+                    <p class="text-white-50 small mb-0">Your enrolled courses and academic activity appear here.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    
+            </div>
+        </div>
+        </div>
+
+        <div class="row g-4 mb-4" id="continueLearning">
+            <div class="col-lg-8">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0">Continue learning</h5>
+            <a href="student-view.html#continueLearning" class="text-decoration-none text-primary small fw-semibold">View enrolled courses <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+
+        <div class="row g-3 student-course-frame" id="studentCoursesGrid">
+            <div class="col-12"><div class="alert alert-light border">Loading your enrolled courses…</div></div>
+        </div>
+    </div>
+
+
+        </div>
+
+    </div>
+
+
+    <script>
+      // Display the user returned by the backend login response, not demo text.
+      (() => {
+        let user = null;
+        try {
+          user = JSON.parse(localStorage.getItem("itaskUser") || "null");
+        } catch (error) {
+          console.error("Could not read the signed-in user from localStorage.", error);
+        }
+        const heading = document.getElementById("studentWelcomeHeading");
+        const avatar = document.getElementById("studentAvatar");
+        if (!user || String(user.role || "").toLowerCase() !== "student") {
+          if (heading) heading.textContent = "Welcome back!";
+          return;
+        }
+        const name = String(user.full_name || "Student").trim();
+        if (heading) heading.textContent = `Welcome back, ${name}!`;
+        if (avatar) {
+          const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
+          avatar.textContent = initials || "ST";
+          avatar.title = name;
+          avatar.setAttribute("aria-label", name);
+        }
+      })();
+    </script>
+
+    <section class="container-fluid px-4 pb-5" style="max-width:1400px" id="liveStudentAssignments">
+        <div class="card border shadow-sm rounded-4 student-assignment-frame">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div><h4 class="fw-bold mb-1">My assignments</h4><p class="text-muted small mb-0">Assignments from your enrolled courses, including deadlines and grades.</p></div>
+                    <button class="btn btn-outline-primary btn-sm" id="studentRefreshAssignments">Refresh</button>
+                </div>
+                <div id="studentAssignmentStatus" class="small text-muted py-2" role="status">Loading assignments…</div>
+                <div id="studentAssignmentsList" class="row g-3"></div>
+            </div>
+        </div>
+    </section>
+    <script>
+    (() => {
+      const API = "";
+      const token = localStorage.getItem("itaskToken");
+      const status = document.getElementById("studentAssignmentStatus");
+      const list = document.getElementById("studentAssignmentsList");
+      const headers = () => ({ "Authorization": `Bearer ${token}`, "Content-Type": "application/json" });
+      const safe = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+      async function api(path, options = {}) {
+        const response = await fetch(API + path, { ...options, headers: headers() });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.message || `Request failed (${response.status})`);
+        return data;
+      }
+      function error(message) { status.className = "alert alert-danger py-2"; status.textContent = message; }
+      async function load() {
+        if (!token) { status.className = "alert alert-warning py-2"; status.textContent = "Log in as a student to load your real assignments."; list.innerHTML = ""; return; }
+        try {
+          const data = await api("/api/student/assignments");
+          status.className = "alert alert-success py-2";
+          status.textContent = `Connected. ${data.assignments.length} assignment(s) loaded from your enrolled courses.`;
+          list.innerHTML = data.assignments.length ? data.assignments.map(a => {
+            const submitted = Boolean(a.submission_id);
+            const overdue = !submitted && new Date(a.deadline).getTime() < Date.now();
+            return `<div class="col-lg-6"><div class="card h-100 border rounded-4"><div class="card-body p-4">
+              <div class="d-flex justify-content-between gap-2"><div><div class="small text-primary fw-semibold">${safe(a.course_name)}</div><h5 class="fw-bold mt-1">${safe(a.title)}</h5></div>
+              <span class="badge ${submitted ? "bg-success" : overdue ? "bg-danger" : "bg-warning text-dark"} align-self-start">${submitted ? "Submitted" : overdue ? "Overdue" : "Pending"}</span></div>
+              <p class="text-muted small">${safe(a.description || "No additional instructions.")}</p>
+              <div class="small mb-3"><strong>Deadline:</strong> ${safe(new Date(a.deadline).toLocaleString())}</div>
+              ${a.file_url ? `<p><a href="${safe(a.file_url)}" target="_blank" rel="noopener noreferrer">Open assignment resource</a></p>` : ""}
+              ${submitted ? `<div class="alert alert-light border small"><strong>Submission:</strong> <a href="${safe(a.submission_file_url)}" target="_blank" rel="noopener noreferrer">Open submitted file</a><br><strong>Submitted:</strong> ${safe(new Date(a.submitted_at).toLocaleString())}<br><strong>Grade:</strong> ${a.grade === null ? "Not graded yet" : safe(a.grade + "/100")} ${a.feedback ? `<br><strong>Feedback:</strong> ${safe(a.feedback)}` : ""}</div>` : ""}
+              ${!submitted && !overdue ? `<form class="student-submit-form mt-3" data-assignment-id="${safe(a.id)}"><label class="form-label small fw-semibold">Upload your solution (PDF)</label><input type="file" accept="application/pdf,.pdf" required class="form-control mb-2"><button class="btn btn-primary btn-sm" type="submit">Submit PDF</button><div class="small text-muted mt-2">PDF only · maximum 5 MB</div></form>` : ""}
+            </div></div></div>`;
+          }).join("") : '<div class="col-12"><div class="alert alert-light border">No assignments are available for your enrolled courses yet.</div></div>';
+        } catch (e) { error(e.message); }
+      }
+      list.addEventListener("submit", async event => {
+        const form = event.target.closest(".student-submit-form");
+        if (!form) return;
+        event.preventDefault();
+        const input = form.querySelector('input[type="file"]');
+        const button = form.querySelector("button");
+        const file = input.files?.[0];
+        if (!file || file.type !== "application/pdf" || file.size > 5 * 1024 * 1024) {
+          error("Please select a PDF file no larger than 5 MB."); return;
+        }
+        button.disabled = true;
+        try {
+          const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader(); reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () => reject(new Error("Could not read the selected PDF."));
+            reader.readAsDataURL(file);
+          });
+          await api(`/api/student/assignments/${encodeURIComponent(form.dataset.assignmentId)}/submissions`, {
+            method: "POST", body: JSON.stringify({ fileData: dataUrl, fileName: file.name })
+          });
+          await load();
+          status.className = "alert alert-success py-2";
+          status.textContent = "Submission saved successfully.";
+        } catch (e) { error(e.message); button.disabled = false; }
+      });
+      document.getElementById("studentRefreshAssignments").addEventListener("click", load);
+      load();
+    })();
+    </script>
+    <script>
+    (() => {
+      const token = localStorage.getItem("itaskToken");
+      const heading = [...document.querySelectorAll("h5")].find(el => el.textContent.trim() === "Continue learning");
+      const grid = heading?.parentElement?.nextElementSibling;
+      if (!grid || !token) return;
+      const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+      fetch("/api/student/courses", { headers: { Authorization: `Bearer ${token}` } })
+        .then(async response => { const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.message || "Could not load courses"); return data; })
+        .then(data => {
+          const courses = Array.isArray(data.courses) ? data.courses : [];
+          grid.innerHTML = courses.length ? courses.map((course, index) => `
+            <div class="col-md-4"><div class="stat-card p-3 h-100 d-flex flex-column justify-content-between border">
+              <div><span class="badge bg-primary-subtle text-primary mb-2 px-2 py-1 rounded-pill">ENROLLED COURSE</span>
+                <h6 class="fw-bold text-dark mb-1">${esc(course.name)}</h6>
+                <span class="text-muted d-block mb-3 small">${esc(course.doctor_name || "Instructor not assigned")}</span>
+                <p class="text-muted small">${esc(course.description || "Your enrolled learning space")}</p></div>
+              <a href="course.html?id=${encodeURIComponent(course.id)}" class="btn btn-light border w-100 text-dark fw-semibold">Resume course <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div></div>`).join("") : '<div class="col-12"><div class="alert alert-light border">You are not enrolled in any courses yet.</div></div>';
+        }).catch(error => { grid.innerHTML = `<div class="col-12"><div class="alert alert-warning">${esc(error.message)}. Please refresh the page.</div></div>`; });
+    })();
+    </script>
+    <nav class="student-section-dots" aria-label="Page sections">
+      <a href="#continueLearning" aria-label="Continue learning" title="Continue learning" class="active"></a>
+      <a href="#liveStudentAssignments" aria-label="My assignments" title="My assignments"></a>
+    </nav>
+    <script>
+    (() => {
+      const links=[...document.querySelectorAll(".student-section-dots a")];
+      links.forEach(link=>link.addEventListener("click",event=>{
+        const target=document.querySelector(link.getAttribute("href"));
+        if(target){event.preventDefault();target.scrollIntoView({behavior:"smooth",block:"start"});}
+      }));
+      const sections=links.map(link=>document.querySelector(link.getAttribute("href"))).filter(Boolean);
+      if("IntersectionObserver" in window){
+        const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+          if(entry.isIntersecting){links.forEach(link=>link.classList.toggle("active",link.getAttribute("href")==="#"+entry.target.id));}
+        }),{rootMargin:"-35% 0px -50% 0px"});
+        sections.forEach(section=>observer.observe(section));
+      }
+    })();
+    </script>
+    <style>
+      html{scroll-behavior:smooth;scroll-padding-top:82px}
+      .student-course-frame{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:16px;min-height:150px}
+      .student-course-frame .stat-card{border-radius:15px!important;box-shadow:0 5px 18px rgba(15,23,42,.045)}
+      .student-assignment-frame{border-color:#e2e8f0!important}
+      .student-section-dots{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:1000;display:flex;flex-direction:column;gap:12px;padding:10px 8px;background:rgba(255,255,255,.92);border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 6px 20px rgba(15,23,42,.08)}
+      .student-section-dots a{display:block;width:9px;height:9px;border-radius:50%;background:#cbd5e1;transition:all .2s}
+      .student-section-dots a.active{background:#2457d6;transform:scale(1.35)}
+      @media(max-width:700px){.student-section-dots{left:auto;right:10px;top:auto;bottom:18px;transform:none;flex-direction:row}}
+    </style>
+    <script>
+    document.getElementById("studentSignOut")?.addEventListener("click",()=>{
+      localStorage.removeItem("itaskToken"); localStorage.removeItem("itaskUser");
+      window.location.href="../login.html";
+    });
+    </script>
+    <script src="../organization-branding.js"></script>
+<script src="../role-workspace-shared.js"></script>
+</body>
+</html>

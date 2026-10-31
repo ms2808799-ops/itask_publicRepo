@@ -1,0 +1,23 @@
+/* iTask stable UI: fixed brand styling and consistent sidebar behavior */
+:root { --itask-primary: #168fbd; --itask-primary-dark: #11749b; }
+#primaryColor, #primaryColorHex, label[for="primaryColor"], .theme-settings, [data-theme-setting] { display:none !important; }
+.sidebar, .it-sidebar { box-sizing:border-box; }
+.sidebar { width:208px; flex:0 0 208px; min-width:208px; }
+.sidebar .nav { width:100%; }
+.sidebar .nav-item { width:100%; }
+.sidebar .nav-link { display:flex; align-items:center; gap:12px; width:100%; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar .nav-link i { flex:0 0 18px; width:18px; text-align:center; }
+.workspace-box { min-width:0; max-width:100%; }
+.workspace-box > div { min-width:0; }
+.workspace-box #workspaceSidebarName { display:block; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.workspace-badge { flex:0 0 28px; overflow:hidden; }
+.workspace-badge img { width:100%; height:100%; object-fit:contain; }
+.it-sidebar .it-nav a { min-width:0; }
+.it-sidebar .it-nav a span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.it-brand { min-width:0; }
+.it-brand span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#organizationLogoPreview { object-fit:contain; }
+@media(max-width: 800px) {
+ .sidebar { width:190px; min-width:190px; flex-basis:190px; }
+ .workspace-box #workspaceSidebarName { max-width:110px; }
+}

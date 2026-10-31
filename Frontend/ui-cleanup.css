@@ -1,0 +1,39 @@
+
+/* iTask UI cleanup patch: stable navigation, branding visibility, and auth selector */
+:root { --itask-primary: #168fbd; --itask-primary-dark: #11749b; }
+.sidebar, .it-sidebar { overflow: visible !important; }
+.workspace-box, .workspace-badge { flex-shrink: 0; }
+.workspace-box { min-width: 0; }
+.workspace-box > div, .workspace-box .d-flex { min-width: 0; }
+.workspace-box .small.fw-semibold { display:block; max-width: 150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.workspace-badge { width:28px; height:28px; min-width:28px; overflow:hidden; }
+.workspace-badge img, #workspaceSidebarBadge img { display:block; width:100%; height:100%; object-fit:contain; }
+.it-sidebar .it-brand { min-width:0; }
+.it-sidebar .it-brand img { width:32px; height:32px; object-fit:contain; flex-shrink:0; }
+.it-sidebar .it-brand span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sidebar .nav-link { min-width:0; }
+.sidebar .nav-link i { width:18px; flex:0 0 18px; text-align:center; }
+.sidebar .nav-link span { min-width:0; }
+.it-sidebar .it-nav a { min-width:0; }
+.it-sidebar .it-nav a i { flex:0 0 18px; width:18px; text-align:center; }
+.it-sidebar .it-nav a span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width: 900px) {
+  .sidebar { width: 208px !important; }
+  .workspace-box .small.fw-semibold { max-width: 125px; }
+}
+.auth-page-body #accountType {
+  appearance:none; -webkit-appearance:none; width:100%; min-height:52px;
+  padding:14px 46px 14px 16px; border:1px solid #d9e2ef; border-radius:14px;
+  background-color:#fff; color:#17243b; font:600 15px/1.35 inherit;
+  box-shadow:0 2px 8px rgba(16,35,66,.04);
+  transition:border-color .18s ease, box-shadow .18s ease;
+  cursor:pointer;
+}
+.auth-page-body #accountType:focus {
+  outline:none; border-color:#168fbd; box-shadow:0 0 0 4px rgba(22,143,189,.13);
+}
+.auth-page-body #organizationId {
+  min-height:50px; border-radius:12px;
+}
+.auth-page-body label[for="accountType"] { display:block; margin-bottom:8px; font-weight:650; color:#263750; }
+.auth-page-body #accountType option { padding:10px; }

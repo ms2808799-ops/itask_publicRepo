@@ -1,0 +1,52 @@
+
+services:
+  itask-backend:
+    build: ./Backend
+    container_name: backend-service
+    env_file:
+      - ./Backend/.env
+    environment:
+      NODE_ENV: production
+      DB_HOST: itask-database
+      DB_PORT: "5432"
+    ports:
+      - "3000:3000"
+    networks:
+      - itask-net
+    depends_on:
+      itask-database:
+        condition: service_healthy
+
+  itask-frontend:
+    build: ./Frontend
+    image: itask-frontend:prototype
+    container_name: frontend-service
+    ports:
+      - "8080:80"
+    networks:
+      - itask-net
+    depends_on:
+      - itask-backend
+
+  itask-database:
+    image: postgres:18
+    container_name: database-service
+    restart: unless-stopped
+    env_file:
+      - ./db.env
+    volumes:
+      - itask-volume:/var/lib/postgresql
+    networks:
+      - itask-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  itask-net:
+    driver: bridge
+
+volumes:
+  itask-volume:

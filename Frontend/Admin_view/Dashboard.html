@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Organization Dashboard | iTask</title>
+<script src="../api-config.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="admin-refresh.css">
+<link rel="stylesheet" href="../role-workspace-shared.css">
+</head><body>
+<aside class="sidebar d-flex flex-column justify-content-between">
+ <div><div class="workspace-box">
+  <div class="workspace-badge" id="workspaceSidebarBadge" data-organization-badge><img alt="Organization logo" src="images/itask logo.webp"></div>
+  <div class="min-w-0"><div class="small text-white-50">WORKSPACE</div><div id="workspaceSidebarName" data-organization-name class="fw-semibold text-white">Organization</div></div>
+ </div><div class="text-uppercase small text-white-50 px-2 mb-2">Main menu</div>
+ <ul class="nav flex-column">
+  <li class="nav-item"><a href="Dashboard.html" class="nav-link active"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+  <li class="nav-item"><a href="courses.html" class="nav-link"><i class="fa-solid fa-book-open"></i> Courses</a></li>
+  <li class="nav-item"><a href="students.html" class="nav-link"><i class="fa-solid fa-users"></i> Students</a></li>
+  <li class="nav-item"><a href="billing.html" class="nav-link"><i class="fa-solid fa-receipt"></i> Billing</a></li>
+  <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> Settings</a></li>
+ </ul></div><div class="text-white-50 small px-2">Organization workspace</div>
+</aside>
+<main class="main-content">
+ <header class="d-flex align-items-center justify-content-between bg-white rounded-4 px-4 py-3 mb-4">
+  <div><div class="text-muted small">ORGANIZATION OVERVIEW</div><h1 class="h4 fw-bold mb-0 mt-1">Dashboard</h1></div>
+  <div class="d-flex align-items-center gap-3"><span id="adminName" class="small fw-semibold text-secondary"></span><span id="adminAvatar" class="it-avatar">AD</span><button id="logoutBtn" class="btn btn-sm btn-outline-secondary">Sign out</button></div>
+ </header>
+ <div id="pageMessage" aria-live="polite"></div>
+ <section class="mb-4"><h2 class="h5 fw-bold mb-1">Organization activity</h2><p class="text-muted small mb-0">Live records belonging to your organization. Empty values are not replaced with sample data.</p></section>
+ <section id="statsGrid" class="admin-data-grid" aria-live="polite"><div class="admin-panel">Loading organization metrics…</div></section>
+ <section class="admin-section admin-data-grid" style="grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr)">
+  <article class="admin-panel"><div class="d-flex justify-content-between align-items-center mb-3"><div><h2>Courses</h2><p>Recently available organization courses</p></div><a href="courses.html" class="small fw-semibold">View courses</a></div><div id="coursePreview" class="it-loading">Loading courses…</div></article>
+  <article class="admin-panel"><div class="mb-3"><h2>People</h2><p>Latest organization accounts</p></div><div id="peoplePreview" class="it-loading">Loading people…</div><a href="students.html" class="small fw-semibold d-inline-block mt-3">Open student directory</a></article>
+ </section>
+</main>
+<script src="admin-app.js"></script><script>document.addEventListener("DOMContentLoaded",()=>{ITaskAdmin.init("dashboard");document.querySelectorAll(".sidebar .nav-link").forEach(a=>{if(a.getAttribute("href")==="Dashboard.html")a.classList.add("active")})});</script>
+<script src="../organization-branding.js"></script>
+<script src="../role-workspace-shared.js"></script>
+</body></html>

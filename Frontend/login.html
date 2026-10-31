@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <script src="api-config.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iTask | Log in</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ui-cleanup.css">
+    <style>
+      .auth-welcome{color:#168fbd!important;font-weight:800;letter-spacing:.12em}
+      .support-contact{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:20px;color:#64748b}
+      .support-contact a{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:999px;background:#e9f8ef;color:#137b43!important;font-weight:750;text-decoration:none;border:1px solid #b9e8cb;transition:.2s}
+      .support-contact a:hover{background:#d8f3e3;transform:translateY(-1px)}
+    </style>
+</head>
+<body class="auth-page-body">
+    <div class="split-screen-section">
+        <div class="left-section">
+            <div class="brand-header">
+                <a href="index.html" class="logo-link">
+                    <img src="images/itask logo.webp" alt="iTask Logo" class="brand-logo-img logo-light">
+                    <span class="brand-name">iTask</span>
+                </a>
+            </div>
+
+            <div class="brand-sparkle-icon">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+
+            <div class="brand-content">
+                <h1>One login. Every learning moment.</h1>
+                <p>Access your courses, teams, insights, and resources from one secure place.</p>
+            </div>
+
+            </div>
+
+        <div class="right-section">
+            <div class="login-wrapper">
+                <div class="form-header">
+                    <div class="subtitle auth-welcome">WELCOME BACK</div>
+                    <h2>Log in to your account</h2>
+                    <p>Enter your details to access your iTask workspace.</p>
+                </div>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="accountType">Account type</label>
+                        <select id="accountType" name="accountType" required>
+                            <option value="organization">Organization account</option>
+                            <option value="platform_admin">Platform administrator</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="organizationGroup">
+                        <label for="organizationId">Organization ID</label>
+                        <input type="number" id="organizationId" name="organizationId" min="1" value="1" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" name="email" placeholder="name@organization.com" autocomplete="username" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                    </div>
+
+                    <button id="loginButton" type="submit" class="btn-submit">Log in</button>
+                    <p id="loginMessage" role="status" aria-live="polite"></p>
+
+                    <div class="create-account support-contact">
+                        <span>New to iTask?</span>
+                        <a href="https://wa.me/201026061074" target="_blank" rel="noopener noreferrer" aria-label="Contact iTask support on WhatsApp">
+                            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Contact us
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

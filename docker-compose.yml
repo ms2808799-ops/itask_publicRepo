@@ -1,7 +1,7 @@
 
 services:
   itask-backend:
-    build: ./Backend
+    image: msalem30/itask_backend:v1.1
     container_name: backend-service
     env_file:
       - ./Backend/.env
@@ -18,8 +18,7 @@ services:
         condition: service_healthy
 
   itask-frontend:
-    build: ./Frontend
-    image: itask-frontend:prototype
+    image: msalem30/itask_frontend:v1.2
     container_name: frontend-service
     ports:
       - "8080:80"

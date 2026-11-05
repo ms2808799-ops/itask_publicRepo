@@ -34,7 +34,7 @@ services:
     env_file:
       - ./db.env
     volumes:
-      - itask-volume:/var/lib/postgresql
+      - itask-volume-v2:/var/lib/postgresql
     networks:
       - itask-net
     healthcheck:
@@ -48,4 +48,4 @@ networks:
     driver: bridge
 
 volumes:
-  itask-volume:
+  itask-volume-v2:

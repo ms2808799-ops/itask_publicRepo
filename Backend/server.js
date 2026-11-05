@@ -10,6 +10,13 @@ const path = require("path");
 const crypto = require("crypto");
 
 const app = express();
+//=======================================================
+// Serve uploaded files
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "uploads"))
+);
+//=======================================================
 const PORT = Number(process.env.PORT || 3000);
 
 // Local development origins plus explicitly configured hosted origins.
